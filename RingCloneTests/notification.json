@@ -1,0 +1,38 @@
+
+
+
+[
+    {
+        "id": "8F4A0C3E-8A16-4A3F-BCC6-0D1F90F5D4BD",
+        "title": "Motion detected",
+        "location": "Front Door",
+        "timestamp": "2025-07-18T14:45:00Z",
+        "videoURL":"https://example.com/videos/motion_2025_07_18.mp4",
+        "message": "Call me back, I couldn't reach your phone."
+    },
+    
+    
+    {
+        "id": "3C4D5E6F-7891-0123-CCCC-345678901222",
+        "title": "Motion Detected",
+        "location": "Front Porch",
+        "timestamp": "2025-07-18T17:10:00Z",
+        "videoURL": "https://example.com/videos/frontporch_0718.mp4",
+        "message": "Hey, your lights are flickering again. You might want to check the wiring."
+        
+    },
+    
+    
+    {
+        "id": "4D5E6F70-8912-1234-DDDD-456789012333",
+        "title": "Motion Detected",
+        "location": "Driveway",
+        "timestamp": "2025-07-18T18:25:00Z",
+        "videoURL": "https://example.com/videos/driveway_0718.mp4",
+        "message": "I left your package behind the flower pot like last time. Hope that’s okay!"
+       
+        
+    }
+    
+    
+]
