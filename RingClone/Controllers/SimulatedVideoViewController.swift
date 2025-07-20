@@ -1,20 +1,30 @@
 //
-//  Simulated.swift
+//  Untitled.swift
 //  RingClone
 //
-//  Created by Esther Nzomo on 7/19/25.
+//  Created by Esther Nzomo on 7/20/25.
 //
 import UIKit
-import AVFoundation
-import Vision
-
 
 
 class SimulatedVideoViewController: UIViewController {
     
-    private var player : AVPlayer?
-    private var displayLink: CADisplayLink?
-    private var videoOutput: AVPlayerVideoOutput?    // lets us extract individual frames from video player
+    let viewModel = SimulatedVideoViewModel()
     
     
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()          //when the screen loads call setupvideoplayback method to start playing sample video
+        viewModel.setupVideoPlayback()
+        
+        
+        
+        if let playerLayer = viewModel.getPlayerLayer(frame: view.bounds) {
+            view.layer.addSublayer(playerLayer)
+        }
+        
+    }
+    deinit {
+           print("Controller deallocated")
+       }
 }
