@@ -19,6 +19,8 @@ class SimulatedVideoViewModel: ObservableObject {
     
     @Published var isPersonDetected = false
     
+    var onPersonDetected: (() -> Void)?
+    
     
     func setupVideoPlayback() {
         guard let path = Bundle.main.path(forResource:"", ofType: "") else {
