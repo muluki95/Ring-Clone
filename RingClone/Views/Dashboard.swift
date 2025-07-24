@@ -41,7 +41,7 @@ struct Dashboard: View {
                         
                        
                         .frame(maxWidth: .infinity)
-                        .frame(height: 110)
+                        .frame(height: 150)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .background(Color.gray.opacity(0.2))
@@ -54,6 +54,14 @@ struct Dashboard: View {
             }
            .padding(.horizontal)
            Spacer()
+            
+            SimulatedVideoView{}
+                .frame(height: 250)
+                .padding()
+                .background(Color.black.opacity(0.1))
+                .cornerRadius(12)
+            
+            Spacer()
         }
         
     }

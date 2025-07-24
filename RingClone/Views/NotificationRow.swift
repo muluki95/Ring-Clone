@@ -6,9 +6,13 @@
 //
 
 import SwiftUI
+import AVKit
 
 
 struct NotificationRow: View {
+    
+    let notification : NotificationItem
+    
     var body: some View {
         NavigationStack{
             HStack(alignment: .top){
@@ -16,9 +20,26 @@ struct NotificationRow: View {
                     Image(systemName: "person")
                 
                 VStack(alignment: .leading, spacing: 6){
-                    Text("Person Detected")
-                    Text("Front Door")
-                    Image(systemName:"person")
+                    Text(notification.title)
+                        .font(.headline)
+                    
+                    Text(notification.location)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    VideoPlayer(player: AVPlayer(url: notification.videoURL))
+                        .frame(height: 200)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+                    
+                    
+                    
+                    if let message = notification.message,
+                       !message.isEmpty {
+                        Text("Message: \(message)")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                    }
                         
                 }
                 .padding(.leading, 16)
@@ -27,7 +48,7 @@ struct NotificationRow: View {
                 
                 VStack (alignment: . trailing){
                     Text("...")
-                    Text("11.46am")
+                    Text(notification.timestamp.formatted())
                     
                 }
                 .padding(.trailing, 14)
@@ -41,6 +62,4 @@ struct NotificationRow: View {
 }
 
 
-#Preview {
-    NotificationRow()
-}
+

@@ -9,11 +9,15 @@ import SwiftUI
 
 
 struct NotificationList: View {
+    
+    @StateObject var viewModel: NotificationViewModel
+    
     var body: some View {
        
-           VStack{
-                ForEach(0 ... 5, id:\.self){ item in
-                    NotificationRow()
+        VStack(spacing: 16){
+            ForEach(viewModel.notifications.reversed()){item in
+                NotificationRow(notification: item)
+                
                 }
             }
             .padding()
@@ -28,5 +32,5 @@ struct NotificationList: View {
 
 
 #Preview{
-    NotificationList()
+    NotificationList(viewModel: NotificationViewModel())
     }
