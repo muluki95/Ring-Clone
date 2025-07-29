@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Dashboard: View {
-    
+    @StateObject var notificationVM = NotificationViewModel()
     
     let buttonsData = [
         (icon: "person.3.fill", title: "Neighbors", subtitle: "New Posts"),
@@ -55,7 +55,10 @@ struct Dashboard: View {
            .padding(.horizontal)
            Spacer()
             
-            SimulatedVideoView{}
+            SimulatedVideoView(videoName: "sample"){
+                notificationVM.addNotification()
+                //print("Person detected in video!")
+            }
                 .frame(height: 250)
                 .padding()
                 .background(Color.black.opacity(0.1))

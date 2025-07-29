@@ -11,12 +11,13 @@ import UIKit
 struct SimulatedVideoView: UIViewControllerRepresentable {
    
     
-   
+    let videoName: String
         let onPersonDetected: () -> Void
         
         
       func makeUIViewController(context: Context) -> SimulatedVideoViewController {
             let controller = SimulatedVideoViewController()
+            controller.viewModel.videoName = videoName
             controller.viewModel.onPersonDetected = onPersonDetected
             return controller
         }

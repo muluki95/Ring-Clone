@@ -12,7 +12,12 @@ class NotificationViewModel: ObservableObject {
     @Published var notifications: [NotificationItem] = []
     
     
-    func addNotification(id: String, title: String, location: String, videoURL: URL, message: String, timestamp: Date){
+    func addNotification(id: String = UUID().uuidString,
+                         title: String = "Motion Detected",
+                         location: String = "Front Door",
+                         videoURL: URL = Bundle.main.url(forResource: "sample", withExtension: "mp4")!,
+                         message: String = "A person was detected",
+                         timestamp: Date = Date()){
         let newNotification = NotificationItem(
             id: UUID(),
             title: title,

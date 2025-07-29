@@ -13,17 +13,17 @@ import Vision
 
 class SimulatedVideoViewModel: ObservableObject {
     
-    private var player : AVPlayer?
+    private var player : AVPlayer?        //plays the video
     private var displayLink: CADisplayLink?
     private var videoOutput: AVPlayerItemVideoOutput?    // lets us extract individual frames from video player
     
     @Published var isPersonDetected = false
-    
+    var videoName: String? = "sample"
     var onPersonDetected: (() -> Void)?
     
     
     func setupVideoPlayback() {
-        guard let path = Bundle.main.path(forResource:"", ofType: "") else {
+        guard let path = Bundle.main.path(forResource:"sample", ofType: "mp4") else {
             print("Video not found")
             return
             
@@ -38,7 +38,7 @@ class SimulatedVideoViewModel: ObservableObject {
         
         player = AVPlayer(playerItem: item)
         
-        let playerLayer = AVPlayerLayer(player: player)   //makes video visible on screen
+        //let playerLayer = AVPlayerLayer(player: player)   //makes video visible on screen
         player?.play()  //start playing the video
         
         displayLink = CADisplayLink(target: self, selector: #selector(captureFrame))
@@ -72,9 +72,13 @@ class SimulatedVideoViewModel: ObservableObject {
        }
     
     func getPlayerLayer(frame: CGRect) -> AVPlayerLayer? {
-        guard let player = player else { return nil }
+        guard let player = player else {
+            print("Player not initialized")
+            return nil
+        }
                 let playerLayer = AVPlayerLayer(player: player)
                 playerLayer.frame = frame
+        print("Player layer created with frame: \(frame)")
                 return playerLayer
         
     }
