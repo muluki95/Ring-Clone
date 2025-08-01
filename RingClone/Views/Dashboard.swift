@@ -10,67 +10,87 @@ import SwiftUI
 struct Dashboard: View {
     @StateObject var notificationVM = NotificationViewModel()
     
-    let buttonsData = [
-        (icon: "person.3.fill", title: "Neighbors", subtitle: "New Posts"),
-        (icon:"play.circle", title: "History", subtitle:"New Activity"),
-        (icon:"doc.text", title: "What's New", subtitle:""),
-        (icon:"square.and.pencil", title: "Edit", subtitle:"")
-    ]
+    
     var body: some View {
-        VStack{
-           HStack( spacing: 8){
-                ForEach(buttonsData , id: \.title){ button in
-                    Button{
-                        
-                    } label: {
-                        VStack{
-                            Image(systemName: button.icon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width:50, height:50)
-                                .foregroundColor(.black)
-                            
-                            Text(button.title)
-                                .foregroundColor(.black)
+        NavigationStack{
+            VStack{
+                HStack( spacing: 8){
+                    NavigationLink(destination: NotificationList(viewModel: notificationVM)) {
+                        VStack(spacing: 8){
+                            Image(systemName: "play.circle")
+                                .font(.system(size:30))
+                            Text("Neighbors")
                                 .font(.caption)
-                            Text(button.subtitle)
-                                .font(.caption)
-                                 
+                                .fontWeight(.bold)
+                                .foregroundColor(.black)
                         }
                         
-                        
-                       
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 150)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(20)
+                        .font(.headline)
+                        .padding()
+                        .frame(width: 100,height: 100)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                    }
+                        NavigationLink(destination: NotificationList(viewModel: notificationVM)) {
+                            VStack(spacing: 8){
+                                Image(systemName: "play.circle")
+                                    .font(.system(size:30))
+                                Text("History")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.black)
+                            }
+                                .font(.headline)
+                                .padding()
+                                .frame(width: 100,height: 100)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(10)
                         
                     }
+                    NavigationLink(destination: NotificationList(viewModel: notificationVM)) {
+                        VStack(spacing: 8){
+                            Image(systemName: "play.circle")
+                                .font(.system(size:30))
+                            Text("Edit")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.black)
+                        }
+                        .font(.headline)
+                        .padding()
+                        .frame(width: 100,height: 100)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                    }
+                    
                     
                 }
                 
-            }
-           .padding(.horizontal)
-           Spacer()
-            
-            SimulatedVideoView(videoName: "sample"){
-                notificationVM.addNotification()
-                //print("Person detected in video!")
-            }
+                
+                Spacer()
+                
+                
+                
+                
+                
+                
+                
+                SimulatedVideoView(videoName: "sample"){
+                    notificationVM.addNotification()
+                    //print("Person detected in video!")
+                }
                 .frame(height: 250)
                 .padding()
                 .background(Color.black.opacity(0.1))
                 .cornerRadius(12)
+                
+                Spacer()
+            }
             
-            Spacer()
         }
         
     }
-   
 }
-
 #Preview {
     Dashboard()
 }

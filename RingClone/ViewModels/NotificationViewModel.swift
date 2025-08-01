@@ -28,7 +28,7 @@ class NotificationViewModel: ObservableObject {
             
             
         )
-        notifications.append(newNotification)
+        notifications.insert(newNotification, at: 0)
         
     }
 }
