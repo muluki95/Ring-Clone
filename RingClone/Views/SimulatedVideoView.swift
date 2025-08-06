@@ -6,23 +6,30 @@
 //
 
 import SwiftUI
-import UIKit
+import AVKit
 
-struct SimulatedVideoView: UIViewControllerRepresentable {
-   
+struct SimulatedVideoView: View {
+    let videoURL: URL
+    @ObservedObject var detectionVM: PersonDetectionViewModel
     
-    let videoName: String
-        let onPersonDetected: () -> Void
-        
-        
-      func makeUIViewController(context: Context) -> SimulatedVideoViewController {
-            let controller = SimulatedVideoViewController()
-            controller.viewModel.videoName = videoName
-            controller.viewModel.onPersonDetected = onPersonDetected
-            return controller
+    var body: some View {
+        VStack {
+            VideoPlayer(player: AVPlayer(url: videoURL))
+                .frame(height: 250)
+                .onAppear {
+                    Task {
+                       try await detectionVM.detectPersonInVideo(url: videoURL)
+                    }
+                }
+            
+            if detectionVM.isDetected {
+                Text("Person detected.")
+                    .foregroundColor(.green)
+            } else {
+                Text("Scanning for person...")
+                    .foregroundColor(.gray)
+            }
         }
-      func updateUIViewController(_ uiViewController: SimulatedVideoViewController, context: Context) {
-    
+        .padding()
     }
-    
 }

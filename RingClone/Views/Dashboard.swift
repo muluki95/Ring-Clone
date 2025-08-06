@@ -8,89 +8,31 @@
 import SwiftUI
 
 struct Dashboard: View {
-    @StateObject var notificationVM = NotificationViewModel()
+    @StateObject var viewModel = NotificationViewModel()
+    @StateObject var detectionVM = PersonDetectionViewModel()
     
+    
+    let simulatedVideoURL = Bundle.main.url(forResource: "sample", withExtension: "mp4")
     
     var body: some View {
-        NavigationStack{
-            VStack{
-                HStack( spacing: 8){
-                    NavigationLink(destination: NotificationList(viewModel: notificationVM)) {
-                        VStack(spacing: 8){
-                            Image(systemName: "play.circle")
-                                .font(.system(size:30))
-                            Text("Neighbors")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
+        TabView {
+            if let url = simulatedVideoURL {
+                            SimulatedVideoView(videoURL: url, detectionVM: detectionVM)
+                                .tabItem {
+                                    Label("Live", systemImage: "video")
+                                }
                         }
-                        
-                        .font(.headline)
-                        .padding()
-                        .frame(width: 100,height: 100)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                    }
-                        NavigationLink(destination: NotificationList(viewModel: notificationVM)) {
-                            VStack(spacing: 8){
-                                Image(systemName: "play.circle")
-                                    .font(.system(size:30))
-                                Text("History")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.black)
-                            }
-                                .font(.headline)
-                                .padding()
-                                .frame(width: 100,height: 100)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(10)
-                        
-                    }
-                    NavigationLink(destination: NotificationList(viewModel: notificationVM)) {
-                        VStack(spacing: 8){
-                            Image(systemName: "play.circle")
-                                .font(.system(size:30))
-                            Text("Edit")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                        }
-                        .font(.headline)
-                        .padding()
-                        .frame(width: 100,height: 100)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                    }
-                    
-                    
+            HistoryView(viewModel: viewModel)
+                .tabItem {
+                    Label("History", systemImage: "clock")
                 }
-                
-                
-                Spacer()
-                
-                
-                
-                
-                
-                
-                
-                SimulatedVideoView(videoName: "sample"){
-                    notificationVM.addNotification()
-                    //print("Person detected in video!")
-                }
-                .frame(height: 250)
-                .padding()
-                .background(Color.black.opacity(0.1))
-                .cornerRadius(12)
-                
-                Spacer()
-            }
-            
         }
-        
+        .onAppear {
+            detectionVM.notificationVM = viewModel
+        }
     }
 }
+    
 #Preview {
     Dashboard()
 }
