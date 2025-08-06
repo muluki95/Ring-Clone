@@ -1,38 +1,49 @@
-//
-//  Dashboard.swift
-//  RingClone
-//
-//  Created by Esther Nzomo on 7/15/25.
-//
- 
 import SwiftUI
 
 struct Dashboard: View {
     @StateObject var viewModel = NotificationViewModel()
     @StateObject var detectionVM = PersonDetectionViewModel()
     
-    
-    let simulatedVideoURL = Bundle.main.url(forResource: "sample", withExtension: "mp4")
+    @State private var url: URL? = Bundle.main.url(forResource: "sample", withExtension: "mp4")
     
     var body: some View {
         TabView {
-            if let url = simulatedVideoURL {
-                            SimulatedVideoView(videoURL: url, detectionVM: detectionVM)
-                                .tabItem {
-                                    Label("Live", systemImage: "video")
-                                }
-                        }
+            if let videoURL = url {
+                SimulatedVideoView(videoURL: videoURL, detectionVM: detectionVM)
+                    .tabItem {
+                        Label("Live", systemImage: "video")
+                    }
+            }
+
             HistoryView(viewModel: viewModel)
                 .tabItem {
                     Label("History", systemImage: "clock")
                 }
         }
         .onAppear {
-            detectionVM.notificationVM = viewModel
+            if let videoURL = url {
+                detectionVM.notificationVM = viewModel
+
+                detectionVM.notificationVM?.addNotification(
+                    title: "Motion detected",
+                    location: "Garage",
+                    videoURL: videoURL
+                )
+                
+                Task {
+                    do {
+                        try await detectionVM.detectPersonInVideo(url: videoURL)
+                    } catch {
+                        print("Detection failed: \(error.localizedDescription)")
+                    }
+                }
+            } else {
+                print("❌ Failed to load video URL.")
+            }
         }
     }
 }
-    
+
 #Preview {
     Dashboard()
 }

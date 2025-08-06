@@ -52,7 +52,7 @@ class PersonDetectionViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.isDetected = true
                     if let url = self.videoURL {
-                        self.notificationVM?.addNotification(title: "Person Detected", videoURL: url) //if videoURL is valid add a new notification
+                        self.notificationVM?.addNotification(title: "Person Detected",location:"Front Door", videoURL: url) //if videoURL is valid add a new notification
                     }
                 }
             }

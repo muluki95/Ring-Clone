@@ -18,7 +18,11 @@ struct SimulatedVideoView: View {
                 .frame(height: 250)
                 .onAppear {
                     Task {
-                       try await detectionVM.detectPersonInVideo(url: videoURL)
+                        do{
+                            try await detectionVM.detectPersonInVideo(url: videoURL)
+                        } catch {
+                            print("Detection failed: \(error.localizedDescription)")
+                        }
                     }
                 }
             

@@ -17,7 +17,7 @@ struct NotificationRow: View {
         NavigationStack{
             HStack(alignment: .top){
                 
-                    Image(systemName: "person")
+                    //Image(systemName: "person")
                 
                 VStack(alignment: .leading, spacing: 6){
                     Text(notification.title)
@@ -28,7 +28,7 @@ struct NotificationRow: View {
                         .foregroundColor(.secondary)
                     
                     VideoPlayer(player: AVPlayer(url: notification.videoURL))
-                        .frame(height: 200)
+                        .frame(width: 80, height: 80)
                         .cornerRadius(10)
                         .shadow(radius: 5)
                     
