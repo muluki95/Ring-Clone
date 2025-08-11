@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct Dashboard: View {
-    @StateObject var viewModel = NotificationViewModel()
-    @StateObject var detectionVM = PersonDetectionViewModel()
+    @ObservedObject var notificationVM: NotificationViewModel
+    @ObservedObject var detectionVM: PersonDetectionViewModel
     
     @State private var url: URL? = Bundle.main.url(forResource: "sample", withExtension: "mp4")
     
@@ -15,20 +15,17 @@ struct Dashboard: View {
                     }
             }
 
-            HistoryView(viewModel: viewModel)
+            HistoryView(notificationVM: notificationVM)
                 .tabItem {
                     Label("History", systemImage: "clock")
                 }
         }
         .onAppear {
             if let videoURL = url {
-                detectionVM.notificationVM = viewModel
-
-                detectionVM.notificationVM?.addNotification(
-                    title: "Motion detected",
-                    location: "Garage",
-                    videoURL: videoURL
-                )
+                            notificationVM.addNotification(
+                                title: "Motion detected",
+                                location: "Garage",
+                                videoURL: videoURL)
                 
                 Task {
                     do {
@@ -44,6 +41,10 @@ struct Dashboard: View {
     }
 }
 
+
 #Preview {
-    Dashboard()
+    let notificationVM = NotificationViewModel()
+    let detectionVM = PersonDetectionViewModel(notificationVM: notificationVM)
+    Dashboard(notificationVM: notificationVM, detectionVM: detectionVM)
 }
+

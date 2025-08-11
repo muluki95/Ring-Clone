@@ -10,14 +10,14 @@ import SwiftUI
 
 struct HistoryView: View {
     
-    @ObservedObject var viewModel: NotificationViewModel
+    @ObservedObject var notificationVM: NotificationViewModel
     
     var body: some View {
        
         NavigationStack {
             ScrollView{
                 LazyVStack(spacing: 0) {
-                    ForEach(viewModel.notifications){ notification in NotificationRow(notification: notification)
+                    ForEach(notificationVM.notifications){ notification in NotificationRow(notification: notification)
                         
                     }
                     

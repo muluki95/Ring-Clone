@@ -1,64 +1,108 @@
-//
-//  PersonDetectionViewModel.swift
-//  RingClone
-//
-//  Created by Esther Nzomo on 7/31/25.
-//
-
-import AVFoundation
+import Foundation
 import Vision
-import SwiftUI
+import AVFoundation
+import UIKit
 
 class PersonDetectionViewModel: ObservableObject {
-    @Published var isDetected: Bool = false
-    var videoURL: URL?
-    var notificationVM: NotificationViewModel?
+    @Published var isDetected = false
+    @Published var notifications: [NotificationItem] = []
+    var notificationVM: NotificationViewModel
     
-    
-    //load video file
-    func detectPersonInVideo(url: URL) async throws{
-        self.videoURL = url
-        try await extractFrames(from: url)
-        
-    }
-    
-    //extracts each frame from the video
-    private func extractFrames(from videoURL: URL) async throws{
-        let asset = AVURLAsset(url: videoURL)     // loads the video in AVAsset
-        let reader = try! AVAssetReader(asset: asset)  //reader extract data from the asset.
-        
-        
-        guard let videoTrack = try await asset.loadTracks(withMediaType: .video).first else {return}
-        
-        let outputSettings: [String: Any] = [ kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
-        let readerOutput = AVAssetReaderTrackOutput(track: videoTrack, outputSettings: outputSettings) //Configures how to read video frames with the desired format
-        reader.add(readerOutput)
-        reader.startReading()
-        
-        while let sampleBuffer = readerOutput.copyNextSampleBuffer(){
-            if let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer){   //convert each CMSampleBuffer to CIImage
-                let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                detectPerson(in: ciImage)  //Pass it to the detectPerson function to analyze the frame.
-            }
-            
+    init(notificationVM: NotificationViewModel) {
+            self.notificationVM = notificationVM
         }
-        
-    }
-    //run person detection with Vision
-    private func detectPerson(in ciImage: CIImage){
-        let request = VNDetectHumanRectanglesRequest{ [weak self] request, error in
-            guard let self = self else {return}
-            if let results = request.results as? [VNHumanObservation], !results.isEmpty{  //checks if people were found in the frame
-                DispatchQueue.main.async {
-                    self.isDetected = true
-                    if let url = self.videoURL {
-                        self.notificationVM?.addNotification(title: "Person Detected",location:"Front Door", videoURL: url) //if videoURL is valid add a new notification
+
+    private let frameInterval: Int = 30 // Process every 30th frame
+    private let detectionQueue = DispatchQueue(label: "person.detection.queue")
+
+    func detectPersonInVideo(url: URL) async throws {
+        self.isDetected = false
+        self.notifications = []
+
+        let asset = AVURLAsset(url: url)
+        let reader = try AVAssetReader(asset: asset)
+
+        guard let videoTrack = try await asset.loadTracks(withMediaType: .video).first else {
+            throw NSError(domain: "No video track found", code: -1)
+        }
+
+        let outputSettings: [String: Any] = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+        ]
+
+        let trackOutput = AVAssetReaderTrackOutput(track: videoTrack, outputSettings: outputSettings)
+        reader.add(trackOutput)
+        reader.startReading()
+
+        var frameCount = 0
+        while let sampleBuffer = trackOutput.copyNextSampleBuffer() {
+            if frameCount % frameInterval == 0 {
+                print("📸 Got frame \(frameCount), running detection")
+
+                if let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+                    try await detectPerson(in: imageBuffer)
+
+                    if self.isDetected {
+                        print("✅ Person detected!")
+                        addNotification(videoURL: url)
+                        break
                     }
+                } else {
+                    print("❌ Could not get image buffer")
                 }
             }
-            
+            frameCount += 1
         }
-        let handler = VNImageRequestHandler(ciImage: ciImage, options: [:])  //Sets up a Vision request handler using the frame image
-        try? handler.perform([request])
+
+        print("✅ Finished scanning frames")
+    }
+
+    private func detectPerson(in pixelBuffer: CVPixelBuffer) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            let request = VNDetectHumanRectanglesRequest { request, error in
+                if let error = error {
+                    print("❌ Vision request error: \(error.localizedDescription)")
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                guard let results = request.results as? [VNHumanObservation], !results.isEmpty else {
+                    DispatchQueue.main.async {
+                        self.isDetected = false
+                        continuation.resume()
+                    }
+                    return
+                }
+
+                DispatchQueue.main.async {
+                    self.isDetected = true
+                    continuation.resume()
+                           }
+            }
+
+            let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
+            do {
+                try handler.perform([request])
+            } catch {
+                print("❌ Vision request failed: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                  continuation.resume(throwing: error)
+                            }
+            }
+        }
+    }
+
+    private func addNotification(videoURL: URL) {
+        let newNotification = NotificationItem(
+            title: "Person Detected",
+            location: "Garage", // You can customize this
+            timestamp: Date(),
+            videoURL: videoURL,
+            message: ""
+        )
+
+        DispatchQueue.main.async {
+            self.notifications.append(newNotification)
+        }
     }
 }

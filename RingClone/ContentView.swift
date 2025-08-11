@@ -1,21 +1,25 @@
-//
-//  ContentView.swift
-//  RingClone
-//
-//  Created by Esther Nzomo on 7/15/25.
-//
+
+
+
+
+
 
 import SwiftUI
 
 struct ContentView: View {
+    // Create your shared view models here
+    @StateObject private var notificationVM: NotificationViewModel
+    @StateObject private var detectionVM: PersonDetectionViewModel
+
+    init() {
+        // Initialize detectionVM with notificationVM dependency
+        let notifVM = NotificationViewModel()
+        _notificationVM = StateObject(wrappedValue: notifVM)
+        _detectionVM = StateObject(wrappedValue: PersonDetectionViewModel(notificationVM: notifVM))
+    }
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        Dashboard(notificationVM: notificationVM,detectionVM: detectionVM)
     }
 }
 
