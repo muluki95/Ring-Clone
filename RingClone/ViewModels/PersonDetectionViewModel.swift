@@ -16,6 +16,17 @@ class PersonDetectionViewModel: ObservableObject {
     private let detectionQueue = DispatchQueue(label: "person.detection.queue")
 
     func detectPersonInVideo(url: URL) async throws {
+        if ProcessInfo.processInfo.isSimulator || ProcessInfo.processInfo.isPreview {
+                // Simulate detection on preview/simulator
+                await MainActor.run {
+                    self.isDetected = true
+                    self.addNotification(videoURL: url)
+                }
+                return
+            }
+        
+        
+        //real detection on physical device
         self.isDetected = false
         self.notifications = []
 
@@ -92,7 +103,7 @@ class PersonDetectionViewModel: ObservableObject {
         }
     }
 
-    private func addNotification(videoURL: URL) {
+    func addNotification(videoURL: URL) {
         let newNotification = NotificationItem(
             title: "Person Detected",
             location: "Garage", // You can customize this

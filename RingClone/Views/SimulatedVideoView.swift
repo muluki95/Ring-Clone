@@ -17,6 +17,7 @@ struct SimulatedVideoView: View {
             VideoPlayer(player: AVPlayer(url: videoURL))
                 .frame(height: 250)
                 .onAppear {
+                    guard !ProcessInfo.processInfo.isPreview else { return }
                     Task {
                         do{
                             try await detectionVM.detectPersonInVideo(url: videoURL)

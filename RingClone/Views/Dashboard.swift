@@ -1,10 +1,11 @@
 import SwiftUI
+import Foundation
 
 struct Dashboard: View {
     @ObservedObject var notificationVM: NotificationViewModel
     @ObservedObject var detectionVM: PersonDetectionViewModel
     
-    @State private var url: URL? = Bundle.main.url(forResource: "sample", withExtension: "mp4")
+    @State var url: URL? = Bundle.main.url(forResource: "sample", withExtension: "mp4")
     
     var body: some View {
         TabView {
@@ -21,6 +22,7 @@ struct Dashboard: View {
                 }
         }
         .onAppear {
+            guard !ProcessInfo.processInfo.isPreview else { return }
             if let videoURL = url {
                             notificationVM.addNotification(
                                 title: "Motion detected",
@@ -41,10 +43,28 @@ struct Dashboard: View {
     }
 }
 
-
 #Preview {
-    let notificationVM = NotificationViewModel()
-    let detectionVM = PersonDetectionViewModel(notificationVM: notificationVM)
-    Dashboard(notificationVM: notificationVM, detectionVM: detectionVM)
+    let mockVM = NotificationViewModel()
+    if let videoURL = Bundle.main.url(forResource: "sample", withExtension: "mp4") {
+        mockVM.addNotification(
+            title: "Preview Motion",
+            location: "Garage",
+            videoURL: videoURL
+        )
+        
+        class MockDetectionVM: PersonDetectionViewModel {
+            override func detectPersonInVideo(url: URL) async throws {
+                await MainActor.run {
+                    self.isDetected = true
+                    self.addNotification(videoURL: url)
+                }
+            }
+        }
+        
+        let mockDetectionVM = MockDetectionVM(notificationVM: mockVM)
+        
+        return Dashboard(notificationVM: mockVM, detectionVM: mockDetectionVM)
+    } else {
+        return Text(" sample.mp4 not found in bundle")
+    }
 }
-
